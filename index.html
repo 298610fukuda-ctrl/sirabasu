@@ -1,26 +1,640 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>FE 500問道場 | シラバス Ver.9.2</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>基本情報技術者 500問道場</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Noto Sans JP",
+        sans-serif;
+    background: #f4f6f8;
+    color: #222;
+}
+
+header {
+    background: #1565c0;
+    color: white;
+    padding: 22px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 25px;
+}
+
+header p {
+    margin: 8px 0 0;
+    opacity: 0.9;
+}
+
+.container {
+    max-width: 800px;
+    margin: 25px auto;
+    padding: 0 15px;
+}
+
+.status {
+    background: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+}
+
+.category {
+    display: inline-block;
+    background: #e3f2fd;
+    color: #1565c0;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    margin-bottom: 15px;
+}
+
+.question-number {
+    color: #777;
+    font-size: 14px;
+}
+
+.question {
+    font-size: 20px;
+    line-height: 1.7;
+    margin: 10px 0 22px;
+    font-weight: 600;
+}
+
+.choice {
+    width: 100%;
+    display: block;
+    text-align: left;
+    padding: 14px 16px;
+    margin: 10px 0;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 9px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+.choice:hover {
+    background: #f5f9ff;
+    border-color: #1565c0;
+}
+
+.choice.correct {
+    background: #e8f5e9;
+    border-color: #2e7d32;
+}
+
+.choice.wrong {
+    background: #ffebee;
+    border-color: #c62828;
+}
+
+.choice:disabled {
+    cursor: default;
+    color: #222;
+}
+
+.result {
+    display: none;
+    margin-top: 20px;
+    padding: 18px;
+    border-radius: 10px;
+    background: #f5f5f5;
+    line-height: 1.7;
+}
+
+.result-title {
+    font-size: 19px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.correct-text {
+    color: #2e7d32;
+}
+
+.wrong-text {
+    color: #c62828;
+}
+
+.term {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+.next-button {
+    display: none;
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px;
+    background: #1565c0;
+    color: white;
+    border: 0;
+    border-radius: 9px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.next-button:hover {
+    background: #0d47a1;
+}
+
+.reset-button {
+    margin-top: 15px;
+    padding: 10px 15px;
+    background: #555;
+    color: white;
+    border: 0;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+footer {
+    text-align: center;
+    color: #777;
+    font-size: 13px;
+    padding: 30px;
+}
+
+@media(max-width:600px) {
+    .question {
+        font-size: 18px;
+    }
+
+    .card {
+        padding: 18px;
+    }
+}
+</style>
 </head>
+
 <body>
-<header><div class="wrap"><h1>FE 500問道場</h1><p>基本情報技術者試験 シラバス Ver.9.2 用語チェック</p></div></header>
-<main class="wrap">
-<section class="panel controls">
-  <label>分野<select id="field"><option value="all">全分野</option><option>テクノロジ系</option><option>マネジメント系</option><option>ストラテジ系</option></select></label>
-  <label>出題順<select id="order"><option value="sequential">順番</option><option value="random">ランダム</option><option value="wrong">間違えた問題</option></select></label>
-  <button id="start">この条件で開始</button><button id="reset" class="ghost">学習履歴をリセット</button>
-</section>
-<section class="stats"><div><b id="progress">0 / 500</b><span>現在位置</span></div><div><b id="correctRate">-</b><span>正答率</span></div><div><b id="wrongCount">0</b><span>復習候補</span></div></section>
-<section class="panel quiz" id="quiz">
-  <div class="meta"><span id="qid">Q1</span><span id="category"></span></div>
-  <h2 id="question"></h2><div id="options"></div>
-  <div id="result" class="result hidden"><h3 id="resultTitle"></h3><p id="explanation"></p><details><summary>関連用語を見る</summary><p id="related"></p></details></div>
-  <div class="nav"><button id="prev" class="ghost">← 前へ</button><button id="next">次へ →</button></div>
-</section>
-<section class="panel about"><h2>この問題集について</h2><p>IPA「基本情報技術者試験 シラバス Ver.9.2」の用語例ブロックを500問に再構成しています。正解後に関連用語も表示するので、問題だけでなく周辺語もまとめて確認できます。ブラウザのlocalStorageに正誤履歴を保存します。</p></section>
-</main>
-<script src="questions.js"></script><script src="app.js"></script>
-</body></html>
+
+<header>
+    <h1>基本情報技術者 500問道場</h1>
+    <p>FE シラバス Ver.9.2 対応学習用</p>
+</header>
+
+<div class="container">
+
+    <div class="status">
+        <span id="progress">問題 1 / 10</span>
+        <span id="score">正解 0問</span>
+        <span id="rate">正答率 0%</span>
+    </div>
+
+    <div class="card">
+
+        <span class="category" id="category"></span>
+
+        <div class="question-number" id="questionNumber"></div>
+
+        <div class="question" id="question"></div>
+
+        <div id="choices"></div>
+
+        <div class="result" id="result">
+            <div class="result-title" id="resultTitle"></div>
+
+            <div id="explanation"></div>
+
+            <div class="term" id="term"></div>
+        </div>
+
+        <button
+            class="next-button"
+            id="nextButton"
+            onclick="nextQuestion()">
+            次の問題へ
+        </button>
+
+    </div>
+
+    <button class="reset-button" onclick="resetQuiz()">
+        最初からやり直す
+    </button>
+
+</div>
+
+<footer>
+    IPA 基本情報技術者試験シラバス Ver.9.2 を参考にした
+    非公式学習サイトです。
+</footer>
+
+<script>
+
+/*
+==================================================
+問題データ
+==================================================
+answer は正解の選択肢番号
+0 = ア
+1 = イ
+2 = ウ
+3 = エ
+==================================================
+*/
+
+const questions = [
+
+{
+    category: "テクノロジ系 / 基礎理論",
+    question:
+        "2進数の1010を10進数で表したものはどれか。",
+    choices: [
+        "8",
+        "10",
+        "12",
+        "16"
+    ],
+    answer: 1,
+    explanation:
+        "1010₂ = 1×2³ + 0×2² + 1×2¹ + 0×2⁰ = 8 + 2 = 10。",
+    term:
+        "関連用語：2進数、10進数、基数変換"
+},
+
+{
+    category: "テクノロジ系 / 基礎理論",
+    question:
+        "論理演算において、入力の真偽を反転させる演算はどれか。",
+    choices: [
+        "AND",
+        "OR",
+        "XOR",
+        "NOT"
+    ],
+    answer: 3,
+    explanation:
+        "NOTは否定を表す論理演算で、真を偽に、偽を真に反転する。",
+    term:
+        "関連用語：論理演算、否定、真理値"
+},
+
+{
+    category: "テクノロジ系 / アルゴリズム",
+    question:
+        "先に格納したデータから先に取り出すデータ構造はどれか。",
+    choices: [
+        "スタック",
+        "キュー",
+        "木構造",
+        "ハッシュ表"
+    ],
+    answer: 1,
+    explanation:
+        "キューはFIFO（First In First Out）のデータ構造である。",
+    term:
+        "関連用語：キュー、FIFO、スタック、LIFO"
+},
+
+{
+    category: "テクノロジ系 / アルゴリズム",
+    question:
+        "スタックからデータを取り出す操作を何というか。",
+    choices: [
+        "プッシュ",
+        "ポップ",
+        "エンキュー",
+        "デキュー"
+    ],
+    answer: 1,
+    explanation:
+        "スタックへの追加をプッシュ、取り出しをポップという。",
+    term:
+        "関連用語：スタック、LIFO、プッシュ、ポップ"
+},
+
+{
+    category: "テクノロジ系 / コンピュータ構成要素",
+    question:
+        "CPUの性能指標の一つで、1秒間に実行できる命令数を百万単位で表すものはどれか。",
+    choices: [
+        "CPI",
+        "MIPS",
+        "DPI",
+        "RPM"
+    ],
+    answer: 1,
+    explanation:
+        "MIPSはMillion Instructions Per Secondの略で、1秒間に何百万命令を実行できるかを示す。",
+    term:
+        "関連用語：MIPS、CPI、クロック周波数"
+},
+
+{
+    category: "テクノロジ系 / メモリ",
+    question:
+        "キャッシュメモリへの書込みと同時に主記憶にも同じ内容を書き込む方式はどれか。",
+    choices: [
+        "ライトバック",
+        "ライトスルー",
+        "メモリインターリーブ",
+        "ウェアレベリング"
+    ],
+    answer: 1,
+    explanation:
+        "ライトスルー方式では、キャッシュと主記憶の両方へ同時に書き込む。",
+    term:
+        "関連用語：キャッシュメモリ、ライトスルー、ライトバック"
+},
+
+{
+    category: "テクノロジ系 / AI",
+    question:
+        "正解ラベルが付与されたデータを利用してモデルを学習させる方式はどれか。",
+    choices: [
+        "教師あり学習",
+        "教師なし学習",
+        "強化学習",
+        "自己組織化"
+    ],
+    answer: 0,
+    explanation:
+        "教師あり学習では、入力データと正解ラベルの組を利用してモデルを学習する。",
+    term:
+        "関連用語：教師あり学習、分類、回帰、学習データ"
+},
+
+{
+    category: "テクノロジ系 / AI",
+    question:
+        "画像認識などで広く利用されるニューラルネットワークはどれか。",
+    choices: [
+        "CNN",
+        "RNN",
+        "PERT",
+        "FIFO"
+    ],
+    answer: 0,
+    explanation:
+        "CNN（畳み込みニューラルネットワーク）は画像処理・画像認識などで利用される。",
+    term:
+        "関連用語：CNN、ニューラルネットワーク、ディープラーニング"
+},
+
+{
+    category: "テクノロジ系 / セキュリティ",
+    question:
+        "Webアプリケーションの入力欄などを悪用して、不正なSQL文を実行させる攻撃はどれか。",
+    choices: [
+        "SQLインジェクション",
+        "DoS攻撃",
+        "総当たり攻撃",
+        "DNSキャッシュポイズニング"
+    ],
+    answer: 0,
+    explanation:
+        "SQLインジェクションは、入力値を利用して意図しないSQL文を実行させる攻撃である。",
+    term:
+        "関連用語：SQLインジェクション、プレースホルダ、セキュアプログラミング"
+},
+
+{
+    category: "テクノロジ系 / ネットワーク",
+    question:
+        "LAN内で機器を識別するためにネットワークインタフェースなどに割り当てられる識別情報はどれか。",
+    choices: [
+        "URL",
+        "MACアドレス",
+        "ポート番号",
+        "ドメイン名"
+    ],
+    answer: 1,
+    explanation:
+        "MACアドレスはネットワークインタフェースを識別するために利用される。",
+    term:
+        "関連用語：MACアドレス、LAN、データリンク層"
+}
+
+];
+
+
+/*
+==================================================
+クイズ処理
+==================================================
+*/
+
+let current = 0;
+let correctCount = 0;
+let answeredCount = 0;
+
+const labels = ["ア", "イ", "ウ", "エ"];
+
+function showQuestion() {
+
+    const q = questions[current];
+
+    document.getElementById("category").textContent =
+        q.category;
+
+    document.getElementById("questionNumber").textContent =
+        "第" + (current + 1) + "問";
+
+    document.getElementById("question").textContent =
+        q.question;
+
+    document.getElementById("progress").textContent =
+        "問題 " + (current + 1) + " / " + questions.length;
+
+    const choices =
+        document.getElementById("choices");
+
+    choices.innerHTML = "";
+
+    q.choices.forEach((choice, index) => {
+
+        const button =
+            document.createElement("button");
+
+        button.className = "choice";
+
+        button.textContent =
+            labels[index] + "　" + choice;
+
+        button.onclick = () =>
+            answerQuestion(index);
+
+        choices.appendChild(button);
+    });
+
+    document.getElementById("result").style.display =
+        "none";
+
+    document.getElementById("nextButton").style.display =
+        "none";
+}
+
+
+function answerQuestion(selected) {
+
+    const q = questions[current];
+
+    const buttons =
+        document.querySelectorAll(".choice");
+
+    buttons.forEach(button => {
+        button.disabled = true;
+    });
+
+    answeredCount++;
+
+    if (selected === q.answer) {
+
+        correctCount++;
+
+        buttons[selected].classList.add("correct");
+
+        document.getElementById("resultTitle").textContent =
+            "正解！";
+
+        document.getElementById("resultTitle").className =
+            "result-title correct-text";
+
+    } else {
+
+        buttons[selected].classList.add("wrong");
+
+        buttons[q.answer].classList.add("correct");
+
+        document.getElementById("resultTitle").textContent =
+            "不正解　正解は「" +
+            labels[q.answer] +
+            "」";
+
+        document.getElementById("resultTitle").className =
+            "result-title wrong-text";
+    }
+
+    document.getElementById("explanation").textContent =
+        q.explanation;
+
+    document.getElementById("term").textContent =
+        q.term;
+
+    document.getElementById("result").style.display =
+        "block";
+
+    document.getElementById("nextButton").style.display =
+        "block";
+
+    updateScore();
+}
+
+
+function updateScore() {
+
+    const rate =
+        answeredCount === 0
+        ? 0
+        : Math.round(
+            correctCount /
+            answeredCount *
+            100
+        );
+
+    document.getElementById("score").textContent =
+        "正解 " + correctCount + "問";
+
+    document.getElementById("rate").textContent =
+        "正答率 " + rate + "%";
+}
+
+
+function nextQuestion() {
+
+    current++;
+
+    if (current >= questions.length) {
+
+        const rate =
+            Math.round(
+                correctCount /
+                answeredCount *
+                100
+            );
+
+        document.querySelector(".card").innerHTML =
+            `
+            <h2>結果</h2>
+
+            <p style="font-size:22px;">
+                ${questions.length}問終了！
+            </p>
+
+            <p style="font-size:30px;font-weight:bold;">
+                ${correctCount} / ${questions.length}
+            </p>
+
+            <p>
+                正答率 ${rate}%
+            </p>
+
+            <button
+                class="next-button"
+                style="display:block"
+                onclick="location.reload()">
+                もう一度挑戦
+            </button>
+            `;
+
+        return;
+    }
+
+    showQuestion();
+}
+
+
+function resetQuiz() {
+
+    if (
+        confirm(
+            "学習状況をリセットしますか？"
+        )
+    ) {
+        location.reload();
+    }
+}
+
+
+/*
+==================================================
+開始
+==================================================
+*/
+
+showQuestion();
+
+</script>
+
+</body>
+</html>
